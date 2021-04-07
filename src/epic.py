@@ -11,13 +11,13 @@ def _perform_request(country):
     return res.json()
 
 
-def get_games(country):
+def offers(country):
     # get offers
     res = _perform_request(country)
     elements = res["data"]["Catalog"]["searchStore"]["elements"]
 
     # get relevant fields
-    offers = []
+    out = []
     for e in elements:
 
         # if there is a promotion for e
@@ -28,11 +28,12 @@ def get_games(country):
                 promo = e["promotions"]["promotionalOffers"][0]["promotionalOffers"][0]
             else:
                 promo = e["promotions"]["upcomingPromotionalOffers"][0]["promotionalOffers"][0]
+
             start_date = dt.datetime.fromisoformat(promo["startDate"].split("Z")[0])
             end_date = dt.datetime.fromisoformat(promo["endDate"].split("Z")[0])
 
-            offers.append({"title": e["title"],
-                           "start_date": start_date,
-                           "end_date": end_date})
+            out.append({"title": e["title"],
+                        "start_date": start_date,
+                        "end_date": end_date})
 
-    return offers
+    return out
