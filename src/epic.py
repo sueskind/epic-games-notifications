@@ -1,3 +1,5 @@
+import datetime as dt
+
 import requests as req
 
 URL = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
@@ -10,9 +12,30 @@ def _perform_request(country):
 
 
 def get_games(country):
+    # get offers
     res = _perform_request(country)
+    elements = res["data"]["Catalog"]["searchStore"]["elements"]
 
-    print(res)
+    # get relevant fields
+    offers = []
+    for e in elements:
+
+        # if there is a promotion
+        if e["promotions"]:
+
+            # get dates
+            if e["promotions"]["promotionalOffers"]:
+                promo = e["promotions"]["promotionalOffers"][0]["promotionalOffers"][0]
+            else:
+                promo = e["promotions"]["upcomingPromotionalOffers"][0]["promotionalOffers"][0]
+            start_date = dt.datetime.fromisoformat(promo["startDate"].split("Z")[0])
+            end_date = dt.datetime.fromisoformat(promo["endDate"].split("Z")[0])
+
+            offers.append({"title": e["title"],
+                           "start_date": start_date,
+                           "end_date": end_date})
+
+    return offers
 
 
 if __name__ == '__main__':
