@@ -7,12 +7,15 @@ from . import epic
 TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 
 
-def _format_offer(offer):
-    return "{} ({} - {})".format(
-        offer["title"],
-        offer["start_date"].strftime("%Y-%m-%d"),
-        offer["end_date"].strftime("%Y-%m-%d")
-    )
+def _format_offer(offer, is_active):
+    if is_active:
+        return "until {}: \"{}\"".format(
+            offer["end_date"].strftime("%d %b"),
+            offer["title"])
+    else:
+        return "from {}: \"{}\"".format(
+            offer["start_date"].strftime("%d %b"),
+            offer["title"])
 
 
 def _escaped_string(s):
@@ -42,8 +45,8 @@ class Notifier:
             else:
                 upcoming.append(o)
 
-        current = "\n".join(_format_offer(o) for o in current)
-        upcoming = "\n".join(_format_offer(o) for o in upcoming)
+        current = "\n".join(_format_offer(o, True) for o in current)
+        upcoming = "\n".join(_format_offer(o, False) for o in upcoming)
 
         message = f"Current:\n{current}\n\nUpcoming:\n{upcoming}"
 
