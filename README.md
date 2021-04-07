@@ -1,0 +1,1 @@
+# Telegram notifications for weekly free games on the Epic Games Store
