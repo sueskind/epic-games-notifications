@@ -20,7 +20,7 @@ def get_games(country):
     offers = []
     for e in elements:
 
-        # if there is a promotion
+        # if there is a promotion for e
         if e["promotions"]:
 
             # get dates
@@ -36,7 +36,3 @@ def get_games(country):
                            "end_date": end_date})
 
     return offers
-
-
-if __name__ == '__main__':
-    get_games("DE")
