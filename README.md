@@ -1,4 +1,4 @@
-# Telegram notifications for weekly free games on the Epic Games Store
+# Epic Games Store free weekly games notifications
 
 This is a short Python script for getting the current Epic Games Store weekly free offers via Telegram notifications.
 
