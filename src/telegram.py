@@ -7,16 +7,18 @@ from . import epic
 TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 
 
-def _format_offer(offer, is_active, days=False):
+def _format_offer(offer, is_active, days):
     """Formats an offer into a string."""
-    if is_active:
-        return "until {}: \"{}\"".format(
-            offer["end_date"].strftime("%d %b"),
-            offer["title"])
-    else:
-        return "from {}: \"{}\"".format(
-            offer["start_date"].strftime("%d %b"),
-            offer["title"])
+    if is_active and days:
+        date_string = f"{(offer['end_date'] - dt.datetime.now()).days} days left"
+    if is_active and not days:
+        date_string = f"until {offer['end_date'].strftime('%d %b')}"
+    if not is_active and days:
+        date_string = f"in {(offer['start_date'] - dt.datetime.now()).days} days"
+    if not is_active and not days:
+        date_string = f"from {offer['start_date'].strftime('%d %b')}"
+
+    return date_string + f": \"{offer['title']}\""
 
 
 def _escaped_string(s):
@@ -54,8 +56,8 @@ class Notifier:
             else:
                 upcoming.append(o)
 
-        current = "\n".join(_format_offer(o, True) for o in current)
-        upcoming = "\n".join(_format_offer(o, False) for o in upcoming)
+        current = "\n".join(_format_offer(o, True, days) for o in current)
+        upcoming = "\n".join(_format_offer(o, False, days) for o in upcoming)
 
         message = f"Current:\n{current}\n\nUpcoming:\n{upcoming}"
 
