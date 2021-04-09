@@ -40,11 +40,11 @@ class Notifier:
     def update_offers(self):
         self.offers = epic.offers(self.country)
 
-    def notify(self, chat_id, show_days=False):
+    def notify(self, chat_ids, show_days=False):
         """
         Gets the current offers and sends a Telegram notification.
 
-        :param chat_id: Integer, Telegram chat id of the receiver.
+        :param chat_ids: List of Integers, Telegram chat ids of the receivers.
         :param show_days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
         """
 
@@ -63,19 +63,20 @@ class Notifier:
 
         message = f"Current:\n{current}\n\nUpcoming:\n{upcoming}"
 
-        params = {
-            "chat_id": chat_id,
-            "text": message
-        }
+        for cid in chat_ids:
+            params = {
+                "chat_id": cid,
+                "text": message
+            }
 
-        res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
-        res.raise_for_status()
+            res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
+            res.raise_for_status()
 
-    def notify_weekly(self, chat_id, dow, time, show_days=False, ignore_errors=False):
+    def notify_weekly(self, chat_ids, dow, time, show_days=False, ignore_errors=False):
         """
         Run loop to send notification weekly on a given day of week.
 
-        :param chat_id: Integer, Telegram chat id of the receiver.
+        :param chat_ids: List of Integers, Telegram chat ids of the receivers.
         :param dow: Integer, 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
         :param time: String, clock time for the notification. Format: HH:MM
         :param ignore_errors: Boolean, set True to keep the loop running if any Exception is thrown. Default: False
@@ -84,7 +85,7 @@ class Notifier:
 
         def job():
             self.update_offers()
-            self.notify(chat_id, show_days)
+            self.notify(chat_ids, show_days)
 
         if dow == 0:
             day_name = "Monday"
@@ -110,7 +111,7 @@ class Notifier:
         else:
             raise ValueError("Day of the week (dow) must be 0-6.")
 
-        print(f"Notifying {chat_id} every {day_name} at {time}.")
+        print(f"Notifying {chat_ids} every {day_name} at {time}.")
 
         if ignore_errors:
             print("Ignoring errors.")
@@ -126,22 +127,22 @@ class Notifier:
                 schedule.run_pending()
                 sleep(1)
 
-    def notify_on_change(self, chat_id, update_interval=300, initial=False, show_days=False, ignore_errors=False):
+    def notify_on_change(self, chat_ids, update_interval=300, initial=False, show_days=False, ignore_errors=False):
         """
         Run loop to send notification when the offers changed.
 
-        :param chat_id: Integer, Telegram chat id of the receiver.
+        :param chat_ids: List of Integers, Telegram chat ids of the receivers.
         :param update_interval: Float, the seconds between refreshes. Default: 300
         :param initial: Boolean, whether to send a notification when starting the loop. Default: False
         :param ignore_errors: Boolean, set True to keep the loop running if any Exception is thrown. Default: False
         :param show_days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
         """
 
-        print(f"Notifying {chat_id} when offers change (refreshing every {update_interval} seconds).")
+        print(f"Notifying {chat_ids} when offers change (refreshing every {update_interval} seconds).")
 
         self.update_offers()
         if initial:
-            self.notify(chat_id, show_days)
+            self.notify(chat_ids, show_days)
 
         last_offers = self.offers
 
@@ -152,7 +153,7 @@ class Notifier:
                     sleep(update_interval)
                     self.update_offers()
                     if last_offers != self.offers:
-                        self.notify(chat_id, show_days)
+                        self.notify(chat_ids, show_days)
                         last_offers = self.offers
                 except Exception:
                     pass
@@ -162,5 +163,5 @@ class Notifier:
                 sleep(update_interval)
                 self.update_offers()
                 if last_offers != self.offers:
-                    self.notify(chat_id, show_days)
+                    self.notify(chat_ids, show_days)
                     last_offers = self.offers
