@@ -1,21 +1,22 @@
 import datetime as dt
 
 import requests as req
+import schedule
 
 from . import epic
 
 TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 
 
-def _format_offer(offer, is_active, days):
+def _format_offer(offer, is_active, show_days):
     """Formats an offer into a string."""
-    if is_active and days:
+    if is_active and show_days:
         date_string = f"{(offer['end_date'] - dt.datetime.now()).days} days left"
-    if is_active and not days:
+    if is_active and not show_days:
         date_string = f"until {offer['end_date'].strftime('%d %b')}"
-    if not is_active and days:
+    if not is_active and show_days:
         date_string = f"in {(offer['start_date'] - dt.datetime.now()).days} days"
-    if not is_active and not days:
+    if not is_active and not show_days:
         date_string = f"from {offer['start_date'].strftime('%d %b')}"
 
     return date_string + f": \"{offer['title']}\""
@@ -38,12 +39,12 @@ class Notifier:
     def update_offers(self):
         self.offers = epic.offers(self.country)
 
-    def notify(self, chat_id, days=False):
+    def notify(self, chat_id, show_days=False):
         """
         Gets the current offers and sends a Telegram notification.
 
         :param chat_id: Integer, Telegram chat id of the receiver.
-        :param days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
+        :param show_days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
         """
 
         if not self.offers:
@@ -56,8 +57,8 @@ class Notifier:
             else:
                 upcoming.append(o)
 
-        current = "\n".join(_format_offer(o, True, days) for o in current)
-        upcoming = "\n".join(_format_offer(o, False, days) for o in upcoming)
+        current = "\n".join(_format_offer(o, True, show_days) for o in current)
+        upcoming = "\n".join(_format_offer(o, False, show_days) for o in upcoming)
 
         message = f"Current:\n{current}\n\nUpcoming:\n{upcoming}"
 
@@ -68,3 +69,57 @@ class Notifier:
 
         res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
         res.raise_for_status()
+
+    def notify_weekly(self, chat_id, dow, time, show_days=False, ignore_errors=False):
+        """
+        Run loop to send notification weekly on a given day of week.
+
+        :param chat_id: Integer, Telegram chat id of the receiver.
+        :param dow: Integer, 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
+        :param time: String, clock time for the notification. Format: HH:MM
+        :param ignore_errors: Boolean, set True to keep the loop running if any Exception is thrown. Default: False
+        :param show_days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
+        """
+
+        def job():
+            self.notify(chat_id, show_days)
+
+        if dow == 0:
+            day_name = "Monday"
+            schedule.every().monday.at(time).do(job)
+        elif dow == 1:
+            day_name = "Tuesday"
+            schedule.every().tuesday.at(time).do(job)
+        elif dow == 2:
+            day_name = "Wednesday"
+            schedule.every().wednesday.at(time).do(job)
+        elif dow == 3:
+            day_name = "Thursday"
+            schedule.every().thursday.at(time).do(job)
+        elif dow == 4:
+            day_name = "Friday"
+            schedule.every().friday.at(time).do(job)
+        elif dow == 5:
+            day_name = "Saturday"
+            schedule.every().saturday.at(time).do(job)
+        elif dow == 6:
+            day_name = "Sunday"
+            schedule.every().sunday.at(time).do(job)
+        else:
+            raise ValueError("Day of the week (dow) must be 0-6.")
+
+        print(f"Notifying {chat_id} every {day_name} at {time}")
+
+        if ignore_errors:
+            print("Ignoring errors.")
+            while True:
+                try:
+                    schedule.run_pending()
+                except Exception:
+                    pass
+                time.sleep(1)
+
+        else:
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
