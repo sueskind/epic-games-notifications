@@ -138,6 +138,10 @@ class Notifier:
         :param show_days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
         """
 
+        def offers_equal(offers1, offers2):
+            mutual = {o["title"] for o in offers1} & {o["title"] for o in offers2}
+            return len(offers1) == len(offers2) == len(mutual)
+
         print(f"Notifying {chat_ids} when offers change (refreshing every {update_interval} seconds).")
 
         self.update_offers()
@@ -152,7 +156,7 @@ class Notifier:
                 try:
                     sleep(update_interval)
                     self.update_offers()
-                    if last_offers != self.offers:
+                    if not offers_equal(last_offers, self.offers):
                         self.notify(chat_ids, show_days)
                         last_offers = self.offers
                 except Exception as e:
@@ -162,6 +166,6 @@ class Notifier:
             while True:
                 sleep(update_interval)
                 self.update_offers()
-                if last_offers != self.offers:
+                if not offers_equal(last_offers, self.offers):
                     self.notify(chat_ids, show_days)
                     last_offers = self.offers
