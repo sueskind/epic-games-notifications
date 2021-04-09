@@ -118,8 +118,8 @@ class Notifier:
             while True:
                 try:
                     schedule.run_pending()
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"Ignoring error: {e}")
                 sleep(1)
 
         else:
@@ -155,8 +155,8 @@ class Notifier:
                     if last_offers != self.offers:
                         self.notify(chat_ids, show_days)
                         last_offers = self.offers
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"Ignoring error: {e}")
 
         else:
             while True:
