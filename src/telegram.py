@@ -7,7 +7,8 @@ from . import epic
 TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 
 
-def _format_offer(offer, is_active):
+def _format_offer(offer, is_active, days=False):
+    """Formats an offer into a string."""
     if is_active:
         return "until {}: \"{}\"".format(
             offer["end_date"].strftime("%d %b"),
@@ -19,6 +20,7 @@ def _format_offer(offer, is_active):
 
 
 def _escaped_string(s):
+    """Replaces characters in a string for Markdown V2."""
     for c in "_*[]()~>#+-=|{}.!":
         s = s.replace(c, "\\" + c)
     return s
@@ -34,7 +36,14 @@ class Notifier:
     def update_offers(self):
         self.offers = epic.offers(self.country)
 
-    def notify(self, chat_id):
+    def notify(self, chat_id, days=False):
+        """
+        Gets the current offers and sends a Telegram notification.
+
+        :param chat_id: Integer, Telegram chat id of the receiver.
+        :param days: Boolean, False if the offers' dates should be given, True for day difference. Default: False
+        """
+
         if not self.offers:
             raise AttributeError("No offers registered. Did you run 'update_offers'?")
 
