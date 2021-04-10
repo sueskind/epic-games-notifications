@@ -37,12 +37,12 @@ bot.**
 
 ```python
 # Send weekly notifications at certain day of week at certain time.
-notifier.notify_weekly([604219790], 4, "17:48", show_days=True, ignore_errors=True)
+notifier.notify_weekly([123456], 4, "17:48", show_days=True, ignore_errors=True)
 
 # ... or ...
 
 # Send notifications when a change was detected
-notifier.notify_on_change([604219790, 861219872], 300, initial=True, show_days=False, ignore_errors=True)
+notifier.notify_on_change([123456, 567890], 300, initial=True, show_days=False, ignore_errors=True)
 ```
 
 For further explanation look at the docstrings of the functions.
