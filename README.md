@@ -16,6 +16,8 @@ pip install -r requirements.txt
 ## Usage
 
 ```python
+from src.telegram import Notifier
+
 # Create notifier with telegram token
 notifier = Notifier(bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="DE")
 
@@ -29,3 +31,14 @@ notifier.notify(chat_ids=[123456])
 **Important! In order for a Telegram bot to send a message, it must be allowed to do that first: Send `/start` to the
 bot.**
 
+### Repeating notifications
+
+```python
+# Send weekly notifications at certain day of week at certain time.
+notifier.notify_weekly([604219790], 4, "17:48", show_days=True, ignore_errors=True)
+
+# ... or ...
+
+# Send notifications when a change was detected
+notifier.notify_on_change([604219790, 861219872], 300, initial=True, show_days=False, ignore_errors=True)
+```
