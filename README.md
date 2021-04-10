@@ -15,6 +15,8 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Basic usage
+
 ```python
 from src.telegram import Notifier
 
@@ -42,3 +44,5 @@ notifier.notify_weekly([604219790], 4, "17:48", show_days=True, ignore_errors=Tr
 # Send notifications when a change was detected
 notifier.notify_on_change([604219790, 861219872], 300, initial=True, show_days=False, ignore_errors=True)
 ```
+
+For further explanation look at the docstrings of the functions.
