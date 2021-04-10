@@ -15,4 +15,15 @@ pip install -r requirements.txt
 
 ## Usage
 
-TODO
+Simple example:
+
+```python
+# Create notifier with telegram token
+notifier = Notifier(bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="DE")
+
+# Get current/upcoming offers from Epic Games Store
+notifier.update_offers()
+
+# Send notifications to a list of telegram chat ids.
+notifier.notify(chat_ids=[123456])
+```
