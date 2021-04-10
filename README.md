@@ -15,8 +15,6 @@ pip install -r requirements.txt
 
 ## Usage
 
-Simple example:
-
 ```python
 # Create notifier with telegram token
 notifier = Notifier(bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="DE")
@@ -27,3 +25,7 @@ notifier.update_offers()
 # Send notifications to a list of telegram chat ids.
 notifier.notify(chat_ids=[123456])
 ```
+
+**Important! In order for a Telegram bot to send a message, it must be allowed to do that first: Send `/start` to the
+bot.**
+
