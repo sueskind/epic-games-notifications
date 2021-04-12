@@ -2,7 +2,7 @@
 
 This is a short Python script for getting the current Epic Games Store weekly free offers via Telegram notifications.
 
-<img src="img/tg.png" width="100">
+<img src="img/tg.png" width="600">
 
 ## Prerequisites
 
