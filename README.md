@@ -17,6 +17,9 @@ pip install -r requirements.txt
 
 ## Usage
 
+**Important! In order for a Telegram bot to send a message, it must be allowed to do that first: Send `/start` to the
+bot.**
+
 ### Basic usage
 
 ```python
@@ -31,9 +34,6 @@ notifier.update_offers()
 # Send notifications to a list of telegram chat ids.
 notifier.notify(chat_ids=[123456])
 ```
-
-**Important! In order for a Telegram bot to send a message, it must be allowed to do that first: Send `/start` to the
-bot.**
 
 ### Repeating notifications
 
