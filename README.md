@@ -48,3 +48,9 @@ notifier.notify_on_change([123456, 567890], 300, initial=True, show_days=False, 
 ```
 
 For further explanation look at the docstrings of the functions.
+
+## FAQ
+
+**How do I find out my chat id?**  
+Send a message to your bot. Then go to `https://api.telegram.org/bot<TOKEN>/getUpdates`. It should show recent messages
+together with the chat id of the sender.
