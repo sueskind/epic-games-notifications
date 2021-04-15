@@ -6,6 +6,7 @@ import schedule
 
 from . import epic
 
+# API Doc: https://core.telegram.org/bots/api#sendmessage
 TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 
 
