@@ -62,12 +62,13 @@ class Notifier:
         current = "\n".join(_format_offer(o, True, show_days) for o in current)
         upcoming = "\n".join(_format_offer(o, False, show_days) for o in upcoming)
 
-        message = f"Current:\n{current}\n\nUpcoming:\n{upcoming}"
+        message = f"*Current*:\n{_escaped_string(current)}\n\n*Upcoming*:\n{_escaped_string(upcoming)}"
 
         for cid in chat_ids:
             params = {
                 "chat_id": cid,
-                "text": message
+                "text": message,
+                "parse_mode": "MarkdownV2"
             }
 
             res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
