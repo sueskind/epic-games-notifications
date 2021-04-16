@@ -39,7 +39,7 @@ class Notifier:
         self.offers = None
 
     def update_offers(self):
-        self.offers = epic.offers(self.country)
+        self.offers = epic.get_offers(self.country)
 
     def notify(self, chat_ids, show_days=False):
         """
