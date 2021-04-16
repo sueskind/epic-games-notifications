@@ -25,6 +25,9 @@ class Offer:
 
         return date_string + f": \"{self.title}\""
 
+    def __eq__(self, other):
+        return self.title == other.title
+
 
 def _perform_request(country):
     res = req.get(URL, params={"country": country})

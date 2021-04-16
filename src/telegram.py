@@ -127,8 +127,7 @@ class Notifier:
         """
 
         def offers_equal(offers1, offers2):
-            set1 = {o.title for o in offers1}
-            set2 = {o.title for o in offers2}
+            set1, set2 = set(offers1), set(offers2)
             return len(set1 - set2) == len(set2 - set1) == 0
 
         print(f"Notifying {chat_ids} when offers change (refreshing every {update_interval} seconds).")
