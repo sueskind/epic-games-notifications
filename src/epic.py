@@ -12,6 +12,19 @@ class Offer:
         self.start_date = start_date
         self.end_date = end_date
 
+    def format_offer(self, is_active, show_days):
+        """Formats an offer into a string."""
+        if is_active and show_days:
+            date_string = f"{(self.end_date - dt.datetime.now()).days} days left"
+        if is_active and not show_days:
+            date_string = f"until {self.end_date.strftime('%d %b')}"
+        if not is_active and show_days:
+            date_string = f"in {(self.start_date - dt.datetime.now()).days} days"
+        if not is_active and not show_days:
+            date_string = f"from {self.start_date.strftime('%d %b')}"
+
+        return date_string + f": \"{self.title}\""
+
 
 def _perform_request(country):
     res = req.get(URL, params={"country": country})

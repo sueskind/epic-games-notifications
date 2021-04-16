@@ -10,20 +10,6 @@ from . import epic
 TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 
 
-def _format_offer(offer, is_active, show_days):
-    """Formats an offer into a string."""
-    if is_active and show_days:
-        date_string = f"{(offer['end_date'] - dt.datetime.now()).days} days left"
-    if is_active and not show_days:
-        date_string = f"until {offer['end_date'].strftime('%d %b')}"
-    if not is_active and show_days:
-        date_string = f"in {(offer['start_date'] - dt.datetime.now()).days} days"
-    if not is_active and not show_days:
-        date_string = f"from {offer['start_date'].strftime('%d %b')}"
-
-    return date_string + f": \"{offer['title']}\""
-
-
 def _escaped_string(s):
     """Replaces characters in a string for Markdown V2."""
     for c in "_*[]()~>#+-=|{}.!":
@@ -54,13 +40,13 @@ class Notifier:
 
         current, upcoming = [], []
         for o in self.offers:
-            if o["start_date"] < dt.datetime.now():
+            if o.start_date < dt.datetime.now():
                 current.append(o)
             else:
                 upcoming.append(o)
 
-        current = "\n".join(_format_offer(o, True, show_days) for o in current)
-        upcoming = "\n".join(_format_offer(o, False, show_days) for o in upcoming)
+        current = "\n".join(o.format_offer(True, show_days) for o in current)
+        upcoming = "\n".join(o.format_offer(False, show_days) for o in upcoming)
 
         message = f"*Current*:\n{_escaped_string(current)}\n\n*Upcoming*:\n{_escaped_string(upcoming)}"
 
@@ -141,8 +127,8 @@ class Notifier:
         """
 
         def offers_equal(offers1, offers2):
-            set1 = {o["title"] for o in offers1}
-            set2 = {o["title"] for o in offers2}
+            set1 = {o.title for o in offers1}
+            set2 = {o.title for o in offers2}
             return len(set1 - set2) == len(set2 - set1) == 0
 
         print(f"Notifying {chat_ids} when offers change (refreshing every {update_interval} seconds).")
