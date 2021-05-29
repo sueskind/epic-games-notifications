@@ -50,8 +50,10 @@ def get_offers(country):
             # get dates
             if e["promotions"]["promotionalOffers"]:
                 promo = e["promotions"]["promotionalOffers"][0]["promotionalOffers"][0]
-            else:
+            elif e["promotions"]["upcomingPromotionalOffers"]:
                 promo = e["promotions"]["upcomingPromotionalOffers"][0]["promotionalOffers"][0]
+            else:
+                continue
 
             start_date = dt.datetime.fromisoformat(promo["startDate"].split("Z")[0])
             end_date = dt.datetime.fromisoformat(promo["endDate"].split("Z")[0])
