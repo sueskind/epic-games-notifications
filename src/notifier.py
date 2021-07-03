@@ -18,8 +18,17 @@ def _escaped_string(s):
 
 
 class Notifier:
+    TELEGRAM = "telegram"
+    SIGNAL = "signal"
 
-    def __init__(self, bot_token, country="US"):
+    def __init__(self, service, bot_token=None, country="US"):
+        if service.lower() == Notifier.TELEGRAM:
+            pass
+        elif service.lower() == Notifier.SIGNAL:
+            pass
+        else:
+            raise ValueError("Supported services are 'signal' and 'telegram'.")
+
         self.bot_token = bot_token
         self.country = country
         self.offers = None
