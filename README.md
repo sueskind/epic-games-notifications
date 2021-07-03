@@ -1,13 +1,15 @@
 # Epic Games Store free weekly games notifications
 
-This is a short Python script for getting the current Epic Games Store weekly free offers via Telegram notifications.
+This is a short Python script for getting the current Epic Games Store weekly free offers via Telegram or Signal
+messenger notifications.
 
 <img src="img/tg.png" width="500">
 
 ## Prerequisites
 
 - Python 3.6+
-- [Functioning telegram bot](https://www.google.com/search?q=how+to+create+telegram+bot)
+- [Functioning telegram bot](https://www.google.com/search?q=how+to+create+telegram+bot) **or**
+- [Function signal bot](https://github.com/AsamK/signal-cli)
 
 ## Installation
 
@@ -26,13 +28,17 @@ bot.**
 from src.notifier import Notifier
 
 # Create notifier with telegram token
-notifier = Notifier(bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="DE")
+notifier = Notifier(service=Notifier.TELEGRAM, bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="DE")
+# or with signal number
+notifier = Notifier(service=Notifier.SIGNAL, signal_sender_number="+123456789", country="DE")
 
 # Get current/upcoming offers from Epic Games Store
 notifier.update_offers()
 
-# Send notifications to a list of telegram chat ids.
+# Send notifications to a list of Telegram chat ids.
 notifier.notify(recipients=[123456])
+# or phone numbers for Signal
+notifier.notify(recipients=["+123456789"])
 ```
 
 ### Repeating notifications
@@ -51,6 +57,6 @@ For further explanation look at the docstrings of the functions.
 
 ## FAQ
 
-**How do I find out my chat id?**  
+**How do I find out a/my chat id?**  
 Send a message to your bot. Then go to `https://api.telegram.org/bot<TOKEN>/getUpdates`. It should show recent messages
 together with the chat id of the sender.
