@@ -7,12 +7,6 @@ import schedule
 
 from . import epic
 
-# API Doc: https://core.telegram.org/bots/api#sendmessage
-TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
-
-# signal-cli Doc: https://github.com/AsamK/signal-cli
-SIGNAL_CMD_FMT = "echo -e \"{}\" | signal-cli -u {} send {}"
-
 
 def _telegram_escaped_string(s):
     """Replaces characters in a string for Markdown V2."""
@@ -42,6 +36,7 @@ class Notifier:
         self.offers = epic.get_offers(self.country)
 
     def _send_telegram(self, current, upcoming, recipients):
+
         message = f"*Current*:\n{_telegram_escaped_string(current)}\n\n*Upcoming*:\n{_telegram_escaped_string(upcoming)}"
 
         for recp in recipients:
@@ -51,14 +46,20 @@ class Notifier:
                 "parse_mode": "MarkdownV2"
             }
 
-            res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
+            # API Doc: https://core.telegram.org/bots/api#sendmessage
+            telegram_send_fmt = "https://api.telegram.org/bot{}/sendMessage"
+            res = req.get(telegram_send_fmt.format(self.bot_token), params=params)
             res.raise_for_status()
 
     def _send_signal(self, current, upcoming, recipients):
         message = f"Current:\n{_telegram_escaped_string(current)}\n\nUpcoming:\n{_telegram_escaped_string(upcoming)}"
 
         for recp in recipients:
-            subprocess.run(SIGNAL_CMD_FMT.format(message, self.signal_sender_number, recp))
+            # signal-cli Doc: https://github.com/AsamK/signal-cli
+            msg_out = subprocess.Popen(["echo", "-e", f"{message}"], stdout=subprocess.PIPE)
+            signal = subprocess.Popen(["signal-cli", "-u", self.signal_sender_number, "send", recp],
+                                      stdin=msg_out.stdout)
+            signal.wait()
 
     def notify(self, recipients, show_days=False):
         """
