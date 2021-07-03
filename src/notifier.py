@@ -1,4 +1,5 @@
 import datetime as dt
+import subprocess
 from time import sleep
 
 import requests as req
@@ -13,7 +14,7 @@ TELEGRAM_SEND_URL_FMT = "https://api.telegram.org/bot{}/sendMessage"
 SIGNAL_CMD_FMT = "echo -e \"{}\" | signal-cli -u {} send {}"
 
 
-def _escaped_string(s):
+def _telegram_escaped_string(s):
     """Replaces characters in a string for Markdown V2."""
     for c in "_*[]()~>#+-=|{}.!":
         s = s.replace(c, "\\" + c)
@@ -24,26 +25,40 @@ class Notifier:
     TELEGRAM = "telegram"
     SIGNAL = "signal"
 
-    def __init__(self, service, bot_token=None, country="US"):
+    def __init__(self, service, telegram_bot_token=None, signal_sender_number=None, country="US"):
         if service.lower() == Notifier.TELEGRAM:
             self.service = Notifier.TELEGRAM
+            self.bot_token = telegram_bot_token
         elif service.lower() == Notifier.SIGNAL:
             self.service = Notifier.SIGNAL
+            self.signal_sender_number = signal_sender_number
         else:
             raise ValueError("Supported services are 'signal' and 'telegram'.")
 
-        self.bot_token = bot_token
         self.country = country
         self.offers = None
 
     def update_offers(self):
         self.offers = epic.get_offers(self.country)
 
-    def _send_telegram(self):
-        pass
+    def _send_telegram(self, current, upcoming, recipients):
+        message = f"*Current*:\n{_telegram_escaped_string(current)}\n\n*Upcoming*:\n{_telegram_escaped_string(upcoming)}"
 
-    def _send_signal(self):
-        pass
+        for recp in recipients:
+            params = {
+                "chat_id": int(recp),
+                "text": message,
+                "parse_mode": "MarkdownV2"
+            }
+
+            res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
+            res.raise_for_status()
+
+    def _send_signal(self, current, upcoming, recipients):
+        message = f"Current:\n{_telegram_escaped_string(current)}\n\nUpcoming:\n{_telegram_escaped_string(upcoming)}"
+
+        for recp in recipients:
+            subprocess.run(SIGNAL_CMD_FMT.format(message, self.signal_sender_number, recp))
 
     def notify(self, recipients, show_days=False):
         """
@@ -66,17 +81,10 @@ class Notifier:
         current = "\n".join(o.format_offer(True, show_days) for o in current)
         upcoming = "\n".join(o.format_offer(False, show_days) for o in upcoming)
 
-        message = f"*Current*:\n{_escaped_string(current)}\n\n*Upcoming*:\n{_escaped_string(upcoming)}"
-
-        for recp in recipients:
-            params = {
-                "chat_id": int(recp),
-                "text": message,
-                "parse_mode": "MarkdownV2"
-            }
-
-            res = req.get(TELEGRAM_SEND_URL_FMT.format(self.bot_token), params=params)
-            res.raise_for_status()
+        if self.service == Notifier.TELEGRAM:
+            self._send_telegram(current, upcoming, recipients)
+        else:
+            self._send_signal(current, upcoming, recipients)
 
     def notify_weekly(self, recipients, dow, time, show_days=False, ignore_errors=False):
         """
