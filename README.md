@@ -32,7 +32,7 @@ notifier = Notifier(bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="
 notifier.update_offers()
 
 # Send notifications to a list of telegram chat ids.
-notifier.notify(chat_ids=[123456])
+notifier.notify(recipients=[123456])
 ```
 
 ### Repeating notifications
