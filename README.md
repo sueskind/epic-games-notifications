@@ -9,7 +9,7 @@ messenger notifications.
 
 - Python 3.6+
 - [Functioning telegram bot](https://www.google.com/search?q=how+to+create+telegram+bot) **or**
-- [Function signal bot](https://github.com/AsamK/signal-cli)
+- [Function signal bot](https://github.com/AsamK/signal-cli) (Currently only working on Unix/Linux!)
 
 ## Installation
 
