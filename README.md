@@ -23,7 +23,7 @@ bot.**
 ### Basic usage
 
 ```python
-from src.telegram import Notifier
+from src.notifier import Notifier
 
 # Create notifier with telegram token
 notifier = Notifier(bot_token="1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ", country="DE")
