@@ -52,7 +52,7 @@ class Notifier:
             res.raise_for_status()
 
     def _send_signal(self, current, upcoming, recipients):
-        message = f"Current:\n{_telegram_escaped_string(current)}\n\nUpcoming:\n{_telegram_escaped_string(upcoming)}"
+        message = f"Current:\n{current}\n\nUpcoming:\n{upcoming}"
 
         for recp in recipients:
             # signal-cli Doc: https://github.com/AsamK/signal-cli
