@@ -58,5 +58,6 @@ For further explanation look at the docstrings of the functions.
 ## FAQ
 
 **How do I find out a/my chat id?**  
-Send a message to your bot. Then go to `https://api.telegram.org/bot<TOKEN>/getUpdates`. It should show recent messages
-together with the chat id of the sender.
+You can find out your own chat id by sending /myid to [@Echo_ID_Bot](https://t.me/Echo_ID_Bot). Send a message to your
+bot. Then go to `https://api.telegram.org/bot<TOKEN>/getUpdates`. It should show recent messages together with the chat
+id of the sender.
